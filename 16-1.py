@@ -1,76 +1,59 @@
-# 이 게임은 컴퓨터가 생성한 중복되지 않는 3개의 난수를 플레이어가 맞추는 게임
-# 각 시도마다 입력한 숫자와 컴퓨터의 숫자를 비교하여 스트라이크와 볼의 개수를 알려줌
-# 게임은 플레이어가 정답을 맞추거나 패배 조건에 도달할 때 까지 진행
-
-# 게임 규칙
-# 1. 컴퓨터 난수 생성
-# 게임 시작시 0-9사이의 중복되지 않는 정수 3개 생성
-
-# 2. 플레이어 입력
-# 플레이어는 키보드를 통해 0 ~ 9 사이의 정수를 3개 입력
-# 예외 처리는 하지 않습니다. 올바른 입력이 들어온다는 가정
-
-# 3. 게임 패배 조건
-# 시도 횟수가 5번 이상일 경우
-# 스트라이크 아웃 횟수가 2번 이상일경우
-
-# 4. 게임 승리 조건
-# 플레이어가 컴퓨터가 생성한 난수 값을 자리 순서대로 모두 맞출 경우
-
 import random
-
-# 3개의 난수 생성하는 함수 생성
-def com_random():
+# 컴퓨터 난수 생성
+# 게임 시작 시 0~9 사이의 중복되지 않는 정수 3개를 생성합니다.
+def rand_num():
     return random.sample(range(10),3)
 
-# 플레이어의 추측과 비밀번호를 비교하여 스트라이크와 볼을 계산하는 함수 생송
-def check_guess(secret_num, guess):
-    strike = 0
-    ball = 0
-    for i in range(3):
-        if guess[i] == secret_num[i]:
-            strike += 1
-        elif guess[i] in secret_num:
-            ball += 1
-            
+# 플레이어 입력
+# 플레이어는 키보드를 통해 0~9 사이의 정수 3개를 입력합니다.
+def player_input():
+    while True :
+        try :
+            user_input = input("0~9 사이의 숫자를 중복되지 않는 정수 3개를 입력하세요. (공백으로 갯수 카운트) :")
+            user_num = list(map(int,user_input.split()))
+            if len(user_num) == 3 and len(set(user_num)) == 3 and all(0 <= num < 10 for num in user_num):
+                return user_num
+        except ValueError :
+            pass
+        print("잘못된 입력값입니다.다시 입력하세요.")
+# 예외 처리는 하지 않습니다. 올바른 입력이 들어온다고 가정합니다.
+
+def compare_number(player_num, computer_num):
+    strike = sum(1 for a, b in zip(computer_num, player_num) if a == b)
+    ball = sum(1 for num in player_num if num in computer_num) - strike
     return strike, ball
 
-def play():
-    # 게임 시작
-    print("게임을 시작합니다. 컴퓨터가 숫자를 생성했습니다.")
-    
-    # 컴퓨터가 난수 생성
-    secret_num = com_random()
-    
-    # 변수 초기화
+def main() :
+    computer_num = rand_num()
     attemps = 0
-    strikes_out = 0
+    strike_outs = 0
     
-    # 게임 루프
-    while True :
-        # 입력받기
-        guess = input("0부터 9가지의 숫자 중 중복되지않는 3개의 숫자를 입력하세요.")
-        
-        # 스트라이크 볼 계산
-        strike, ball = check_guess(secret_num,guess)
-        
-        # 결과 출력
-        print(f"스트라이크 : {strike}, 볼 : {ball}")
-        
-        # 게임 종료 조건 확인
-        if strike == 3:
-            print("축하합니다! 정답을 맞췄습니다!")
-            break
+    while attemps < 5 and strike_outs < 2:
+        player_num = player_input()
         attemps += 1
-        if attemps >= 5:
-            print("게임 오버! 시도 횟수를 모두 사용했습니다.")
+        
+        strike, ball = compare_number(computer_num, player_num)
+        
+        if strike == 3: 
+            print("축하합니다! 숫자를 정확히 맞추셨습니다.")
             break
-        if strike == 0:
-            strikes_outs += 1
-        if strikes_out >= 2:
-            print("게임 오버! 스트라이크 아웃 횟수가 2번 이상입니다.")
-            break
+        if strike > 0 or ball > 0:
+            print(f"{strike} 스트라이크 , {ball} 볼")
+            
+        elif strike == 0 and ball == 0:
+            strike_outs += 1
+            print("스트라이크 아웃")
+        print(f"현재까지 시도 횟수 : {attemps}")
+        print(f"스트라이크 아웃 횟수 : {strike_outs}")
+    else :   
+        print("게임오버")
+        print(f"컴퓨터의 숫자는 {computer_num}입니다.") 
 
-# 게임 실행
 if __name__ == "__main__":
-    play ()
+    main()       
+# 게임 패배 조건
+# 시도 횟수가 5번 이상일 경우.
+# 스트라이크 아웃(Strike out) 횟수가 2번 이상일 경우.
+#. 게임 승리 조건
+# 플레이어가 컴퓨터가 생성한 난수 값을 자리 순서대로 모두 맞출 경우.
+
