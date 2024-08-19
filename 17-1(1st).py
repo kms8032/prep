@@ -10,7 +10,7 @@ def get_vaild_word():
             # 5자 이상 20자 이하의 단어가 맞는지 확인후 맞으면 추가 아니면 재입력
             if 5 <= len(word) <= 20:
                 words.append(word)
-                break # if문
+                break # while 문에 대한 break이기 때문에 break를 하면 for문 i가 증가하고 다시 while문이 시작이 됨
             else:
                 print("5자 이상 20자 이하의 단어를 입력하세요.")
     return words
